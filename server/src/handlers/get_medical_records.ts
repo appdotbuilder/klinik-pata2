@@ -1,8 +1,17 @@
 
+import { db } from '../db';
+import { medicalRecordsTable, patientsTable, usersTable } from '../db/schema';
 import { type MedicalRecord } from '../schema';
 
-export const getMedicalRecords = async (patientId?: number): Promise<MedicalRecord[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching medical records, optionally filtered by patient ID.
-  return [];
-};
+export async function getMedicalRecords(): Promise<MedicalRecord[]> {
+  try {
+    const results = await db.select()
+      .from(medicalRecordsTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch medical records:', error);
+    throw error;
+  }
+}

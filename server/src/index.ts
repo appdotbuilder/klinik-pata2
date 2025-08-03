@@ -6,45 +6,58 @@ import cors from 'cors';
 import superjson from 'superjson';
 
 // Import schemas
-import {
+import { 
   createUserInputSchema,
+  updateUserInputSchema,
   createPatientInputSchema,
+  updatePatientInputSchema,
   createAppointmentInputSchema,
+  updateAppointmentInputSchema,
   createMedicalRecordInputSchema,
   createMedicineInputSchema,
+  updateMedicineInputSchema,
   createPrescriptionInputSchema,
   createServiceInputSchema,
+  updateServiceInputSchema,
   createBillInputSchema,
+  updateBillInputSchema,
   createPaymentInputSchema,
   createNonMedicalProductInputSchema,
+  updateNonMedicalProductInputSchema,
   createSaleInputSchema
 } from './schema';
 
 // Import handlers
 import { createUser } from './handlers/create_user';
 import { getUsers } from './handlers/get_users';
+import { updateUser } from './handlers/update_user';
 import { createPatient } from './handlers/create_patient';
 import { getPatients } from './handlers/get_patients';
+import { updatePatient } from './handlers/update_patient';
 import { createAppointment } from './handlers/create_appointment';
 import { getAppointments } from './handlers/get_appointments';
+import { updateAppointment } from './handlers/update_appointment';
 import { createMedicalRecord } from './handlers/create_medical_record';
 import { getMedicalRecords } from './handlers/get_medical_records';
 import { createMedicine } from './handlers/create_medicine';
 import { getMedicines } from './handlers/get_medicines';
+import { updateMedicine } from './handlers/update_medicine';
 import { createPrescription } from './handlers/create_prescription';
 import { getPrescriptions } from './handlers/get_prescriptions';
 import { createService } from './handlers/create_service';
 import { getServices } from './handlers/get_services';
+import { updateService } from './handlers/update_service';
 import { createBill } from './handlers/create_bill';
 import { getBills } from './handlers/get_bills';
+import { updateBill } from './handlers/update_bill';
 import { createPayment } from './handlers/create_payment';
 import { getPayments } from './handlers/get_payments';
 import { createNonMedicalProduct } from './handlers/create_non_medical_product';
 import { getNonMedicalProducts } from './handlers/get_non_medical_products';
+import { updateNonMedicalProduct } from './handlers/update_non_medical_product';
 import { createSale } from './handlers/create_sale';
 import { getSales } from './handlers/get_sales';
 import { getDashboardStats } from './handlers/get_dashboard_stats';
-import { z } from 'zod';
 
 const t = initTRPC.create({
   transformer: superjson,
@@ -54,91 +67,109 @@ const publicProcedure = t.procedure;
 const router = t.router;
 
 const appRouter = router({
-  // Health check
   healthcheck: publicProcedure.query(() => {
     return { status: 'ok', timestamp: new Date().toISOString() };
   }),
 
-  // User management
+  // User procedures
   createUser: publicProcedure
     .input(createUserInputSchema)
     .mutation(({ input }) => createUser(input)),
   getUsers: publicProcedure
     .query(() => getUsers()),
+  updateUser: publicProcedure
+    .input(updateUserInputSchema)
+    .mutation(({ input }) => updateUser(input)),
 
-  // Patient management
+  // Patient procedures
   createPatient: publicProcedure
     .input(createPatientInputSchema)
     .mutation(({ input }) => createPatient(input)),
   getPatients: publicProcedure
     .query(() => getPatients()),
+  updatePatient: publicProcedure
+    .input(updatePatientInputSchema)
+    .mutation(({ input }) => updatePatient(input)),
 
-  // Appointment management
+  // Appointment procedures
   createAppointment: publicProcedure
     .input(createAppointmentInputSchema)
     .mutation(({ input }) => createAppointment(input)),
   getAppointments: publicProcedure
     .query(() => getAppointments()),
+  updateAppointment: publicProcedure
+    .input(updateAppointmentInputSchema)
+    .mutation(({ input }) => updateAppointment(input)),
 
-  // Medical record management
+  // Medical record procedures
   createMedicalRecord: publicProcedure
     .input(createMedicalRecordInputSchema)
     .mutation(({ input }) => createMedicalRecord(input)),
   getMedicalRecords: publicProcedure
-    .input(z.object({ patientId: z.number().optional() }))
-    .query(({ input }) => getMedicalRecords(input.patientId)),
+    .query(() => getMedicalRecords()),
 
-  // Medicine management
+  // Medicine procedures
   createMedicine: publicProcedure
     .input(createMedicineInputSchema)
     .mutation(({ input }) => createMedicine(input)),
   getMedicines: publicProcedure
     .query(() => getMedicines()),
+  updateMedicine: publicProcedure
+    .input(updateMedicineInputSchema)
+    .mutation(({ input }) => updateMedicine(input)),
 
-  // Prescription management
+  // Prescription procedures
   createPrescription: publicProcedure
     .input(createPrescriptionInputSchema)
     .mutation(({ input }) => createPrescription(input)),
   getPrescriptions: publicProcedure
     .query(() => getPrescriptions()),
 
-  // Service management
+  // Service procedures
   createService: publicProcedure
     .input(createServiceInputSchema)
     .mutation(({ input }) => createService(input)),
   getServices: publicProcedure
     .query(() => getServices()),
+  updateService: publicProcedure
+    .input(updateServiceInputSchema)
+    .mutation(({ input }) => updateService(input)),
 
-  // Bill management
+  // Bill procedures
   createBill: publicProcedure
     .input(createBillInputSchema)
     .mutation(({ input }) => createBill(input)),
   getBills: publicProcedure
     .query(() => getBills()),
+  updateBill: publicProcedure
+    .input(updateBillInputSchema)
+    .mutation(({ input }) => updateBill(input)),
 
-  // Payment management
+  // Payment procedures
   createPayment: publicProcedure
     .input(createPaymentInputSchema)
     .mutation(({ input }) => createPayment(input)),
   getPayments: publicProcedure
-    .input(z.object({ billId: z.number().optional() }))
-    .query(({ input }) => getPayments(input.billId)),
+    .query(() => getPayments()),
 
-  // Non-medical product management
+  // Non-medical product procedures
   createNonMedicalProduct: publicProcedure
     .input(createNonMedicalProductInputSchema)
     .mutation(({ input }) => createNonMedicalProduct(input)),
   getNonMedicalProducts: publicProcedure
     .query(() => getNonMedicalProducts()),
+  updateNonMedicalProduct: publicProcedure
+    .input(updateNonMedicalProductInputSchema)
+    .mutation(({ input }) => updateNonMedicalProduct(input)),
 
-  // Sales management
+  // Sale procedures
   createSale: publicProcedure
     .input(createSaleInputSchema)
     .mutation(({ input }) => createSale(input)),
   getSales: publicProcedure
     .query(() => getSales()),
 
-  // Dashboard
+  // Dashboard procedures
   getDashboardStats: publicProcedure
     .query(() => getDashboardStats()),
 });
@@ -157,7 +188,7 @@ async function start() {
     },
   });
   server.listen(port);
-  console.log(`Klinik PaTa2 TRPC server listening at port: ${port}`);
+  console.log(`TRPC server listening at port: ${port}`);
 }
 
 start();

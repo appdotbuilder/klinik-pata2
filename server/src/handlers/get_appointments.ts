@@ -1,8 +1,17 @@
 
+import { db } from '../db';
+import { appointmentsTable } from '../db/schema';
 import { type Appointment } from '../schema';
 
 export const getAppointments = async (): Promise<Appointment[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching appointments with patient and doctor details.
-  return [];
+  try {
+    const results = await db.select()
+      .from(appointmentsTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch appointments:', error);
+    throw error;
+  }
 };

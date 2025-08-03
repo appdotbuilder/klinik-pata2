@@ -1,19 +1,33 @@
 
+import { db } from '../db';
+import { medicinesTable } from '../db/schema';
 import { type CreateMedicineInput, type Medicine } from '../schema';
 
 export const createMedicine = async (input: CreateMedicineInput): Promise<Medicine> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is creating a new medicine with auto-generated medicine code
-  // and persisting it in the database.
-  return Promise.resolve({
-    id: 0,
-    medicine_code: 'M000001', // Auto-generated code placeholder
-    name: input.name,
-    description: input.description,
-    unit: input.unit,
-    price: input.price,
-    stock_quantity: input.stock_quantity,
-    is_prescription_only: input.is_prescription_only,
-    created_at: new Date()
-  } as Medicine);
+  try {
+    // Insert medicine record
+    const result = await db.insert(medicinesTable)
+      .values({
+        name: input.name,
+        description: input.description,
+        dosage_form: input.dosage_form,
+        strength: input.strength,
+        manufacturer: input.manufacturer,
+        unit_price: input.unit_price.toString(), // Convert number to string for numeric column
+        stock_quantity: input.stock_quantity || 0, // Apply default if not provided
+        expiry_date: input.expiry_date
+      })
+      .returning()
+      .execute();
+
+    // Convert numeric fields back to numbers before returning
+    const medicine = result[0];
+    return {
+      ...medicine,
+      unit_price: parseFloat(medicine.unit_price) // Convert string back to number
+    };
+  } catch (error) {
+    console.error('Medicine creation failed:', error);
+    throw error;
+  }
 };

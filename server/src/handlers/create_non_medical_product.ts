@@ -1,18 +1,29 @@
 
+import { db } from '../db';
+import { nonMedicalProductsTable } from '../db/schema';
 import { type CreateNonMedicalProductInput, type NonMedicalProduct } from '../schema';
 
 export const createNonMedicalProduct = async (input: CreateNonMedicalProductInput): Promise<NonMedicalProduct> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is creating a new non-medical product with auto-generated product code
-  // and persisting it in the database.
-  return Promise.resolve({
-    id: 0,
-    product_code: 'NM000001', // Auto-generated code placeholder
-    name: input.name,
-    description: input.description,
-    category: input.category,
-    price: input.price,
-    stock_quantity: input.stock_quantity,
-    created_at: new Date()
-  } as NonMedicalProduct);
+  try {
+    // Insert non-medical product record
+    const result = await db.insert(nonMedicalProductsTable)
+      .values({
+        name: input.name,
+        description: input.description,
+        unit_price: input.unit_price.toString(), // Convert number to string for numeric column
+        stock_quantity: input.stock_quantity || 0 // Use default if not provided
+      })
+      .returning()
+      .execute();
+
+    // Convert numeric fields back to numbers before returning
+    const product = result[0];
+    return {
+      ...product,
+      unit_price: parseFloat(product.unit_price) // Convert string back to number
+    };
+  } catch (error) {
+    console.error('Non-medical product creation failed:', error);
+    throw error;
+  }
 };

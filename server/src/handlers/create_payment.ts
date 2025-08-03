@@ -1,17 +1,41 @@
 
+import { db } from '../db';
+import { paymentsTable, billsTable } from '../db/schema';
 import { type CreatePaymentInput, type Payment } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const createPayment = async (input: CreatePaymentInput): Promise<Payment> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is creating a payment record, calculating change amount,
-  // and updating bill payment status.
-  return Promise.resolve({
-    id: 0,
-    bill_id: input.bill_id,
-    amount_paid: input.amount_paid,
-    payment_method: input.payment_method,
-    change_amount: 0, // Calculate based on bill total and amount paid
-    notes: input.notes,
-    created_at: new Date()
-  } as Payment);
+  try {
+    // Verify that the bill exists
+    const bill = await db.select()
+      .from(billsTable)
+      .where(eq(billsTable.id, input.bill_id))
+      .execute();
+
+    if (bill.length === 0) {
+      throw new Error(`Bill with id ${input.bill_id} not found`);
+    }
+
+    // Insert payment record
+    const result = await db.insert(paymentsTable)
+      .values({
+        bill_id: input.bill_id,
+        amount: input.amount.toString(), // Convert number to string for numeric column
+        payment_method: input.payment_method,
+        reference_number: input.reference_number,
+        notes: input.notes
+      })
+      .returning()
+      .execute();
+
+    // Convert numeric fields back to numbers before returning
+    const payment = result[0];
+    return {
+      ...payment,
+      amount: parseFloat(payment.amount) // Convert string back to number
+    };
+  } catch (error) {
+    console.error('Payment creation failed:', error);
+    throw error;
+  }
 };
